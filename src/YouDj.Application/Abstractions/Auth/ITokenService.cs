@@ -5,6 +5,6 @@ namespace YouDj.Application.Abstractions.Auth;
 
 public interface IJwtTokenService
 {
-    Task<AuthResult> IssueAsync(Guid userId, Username username, IEnumerable<string> roles, IDictionary<string, string>? extraClaims = null, CancellationToken ct = default);
+    Task<TokenResult> IssueAsync(Guid userId, Username username, IReadOnlyCollection<string> roles, IReadOnlyDictionary<string, string>? claims, CancellationToken ct);
     AuthTokenValidationResult Validate(string token);
 }

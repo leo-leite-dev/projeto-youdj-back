@@ -1,5 +1,9 @@
+using YouDj.Domain.Features.Common;
+using YouDj.Domain.Features.Queue.Exceptions;
+
 namespace YouDj.Domain.Queue;
-public sealed class QueueItem
+
+public sealed class QueueItem : EntityBase
 {
     public Guid Id { get; private set; }
     public Guid DjId { get; private set; }
@@ -12,20 +16,14 @@ public sealed class QueueItem
     public TimeSpan? Duration { get; private set; }
 
     public QueueStatus Status { get; private set; }
+
     public int Position { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
 
-    private QueueItem() { }  
+    private QueueItem() { }
 
-    public QueueItem(
-        Guid djId,
-        string externalId,
-        string title,
-        string thumbnailUrl,
-        string source,
-        TimeSpan? duration,
-        int position)
+    private QueueItem(Guid djId, string externalId, string title,
+        string thumbnailUrl, string source, TimeSpan? duration)
     {
         Id = Guid.NewGuid();
         DjId = djId;
@@ -34,15 +32,47 @@ public sealed class QueueItem
         ThumbnailUrl = thumbnailUrl;
         Source = source;
         Duration = duration;
-        Position = position;
+
         Status = QueueStatus.Queued;
-        CreatedAt = DateTime.UtcNow;
+        Position = 0;
+    }
+
+    public static QueueItem Create(Guid djId, string externalId, string title,
+        string thumbnailUrl, string source, TimeSpan? duration)
+    {
+        if (djId == Guid.Empty)
+            throw new QueueException("DJ inválido.");
+
+        if (string.IsNullOrWhiteSpace(externalId))
+            throw new QueueException("ExternalId é obrigatório.");
+
+        if (string.IsNullOrWhiteSpace(title))
+            throw new QueueException("Título é obrigatório.");
+
+        if (string.IsNullOrWhiteSpace(source))
+            throw new QueueException("Fonte é obrigatória.");
+
+        return new QueueItem(
+            djId,
+            externalId,
+            title,
+            thumbnailUrl,
+            source,
+            duration);
+    }
+
+    public void SetPosition(int position)
+    {
+        if (position < 0)
+            throw new QueueException("Posição inválida.");
+
+        Position = position;
     }
 
     public void MarkAsPlaying()
     {
         if (Status != QueueStatus.Queued)
-            throw new InvalidOperationException("Item não está na fila.");
+            throw new QueueException("Item não está na fila.");
 
         Status = QueueStatus.Playing;
     }
@@ -50,7 +80,7 @@ public sealed class QueueItem
     public void MarkAsPlayed()
     {
         if (Status != QueueStatus.Playing)
-            throw new InvalidOperationException("Item não está tocando.");
+            throw new QueueException("Item não está tocando.");
 
         Status = QueueStatus.Played;
     }

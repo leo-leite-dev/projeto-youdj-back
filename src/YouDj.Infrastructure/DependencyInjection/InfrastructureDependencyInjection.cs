@@ -2,15 +2,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YouDj.Application.Abstractions.Auth;
+using YouDj.Application.Abstractions.Identity;
+using YouDj.Application.Abstractions.Persistences;
 using YouDj.Application.Abstractions.Repositories;
 using YouDj.Application.Common.Errors;
+using YouDj.Application.Features.Repositories;
 using YouDj.Application.Interfaces.Youtube;
+using YouDj.Infrastructure.Auth.Identity;
 using YouDj.Infrastructure.Auth.Services.Jwt;
 using YouDj.Infrastructure.Auth.Services.Security;
 using YouDj.Infrastructure.Common.Errors;
-using YouDj.Infrastructure.Data.Repositories;
 using YouDj.Infrastructure.Persistence;
-using YouDj.Infrastructure.Persistence.Users;
+using YouDj.Infrastructure.Persistence.Repositories;
 using YouDj.Infrastructure.Youtube;
 
 namespace YouDj.Infrastructure.DependencyInjection;
@@ -24,11 +27,17 @@ public static class InfrastructureDependencyInjection
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection")));
 
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+
         services.AddScoped<IQueueRepository, QueueRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+        services.AddScoped<IGuestRepository, GuestRepository>();
 
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IUserIdentityService, UserIdentityService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IDbErrorTranslator, PostgresDbErrorTranslator>();
 

@@ -12,10 +12,11 @@ public sealed class User : EntityBase
     public Email Email { get; private set; }
     public DateOfBirth BirthDate { get; private set; }
     public string PasswordHash { get; private set; } = string.Empty;
+    
+    public Guid? ActivePlaylistId { get; private set; }
 
     public string? PasswordResetToken { get; private set; }
     public DateTime? PasswordResetTokenExpiresAt { get; private set; }
-
     public int TokenVersion { get; private set; } = 0;
 
     private User() { }
@@ -37,6 +38,15 @@ public sealed class User : EntityBase
 
         user.SetPassword(rawPassword, hash);
         return user;
+    }
+
+    public void SetActivePlaylist(Guid playlistId)
+    {
+        if (playlistId == Guid.Empty)
+            throw new UserException("Playlist inválida.");
+
+        ActivePlaylistId = playlistId;
+        Touch();
     }
 
     public bool ChangeEmail(Email newEmail)

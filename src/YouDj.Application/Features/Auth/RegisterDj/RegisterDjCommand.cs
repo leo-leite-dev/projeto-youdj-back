@@ -3,7 +3,7 @@ using YouDj.Application.Common.Results;
 
 namespace YouDj.Application.Features.Auth.RegisterDj;
 
-public sealed record RegisterDjCommand : IRequest<Result<AuthResult>>
+public sealed record RegisterDjCommand : IRequest<Result<TokenResult>>
 {
     public required string Email { get; init; }
     public required string Username { get; init; }

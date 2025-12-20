@@ -1,6 +1,6 @@
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -23,17 +23,17 @@ public sealed class JwtTokenService : IJwtTokenService
         _logger = logger;
     }
 
-    public Task<AuthResult> IssueAsync(
+    public Task<TokenResult> IssueAsync(
         Guid userId,
         Username username,
-        IEnumerable<string> roles,
-        IDictionary<string, string>? extraClaims = null,
-        CancellationToken ct = default)
+        IReadOnlyCollection<string> roles,
+        IReadOnlyDictionary<string, string>? claims,
+        CancellationToken ct)
     {
         var now = DateTime.UtcNow;
         var expiresAt = now.AddMinutes(_options.AccessTokenMinutes);
 
-        var claims = new List<Claim>
+        var jwtClaims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, username.Value),
@@ -42,16 +42,16 @@ public sealed class JwtTokenService : IJwtTokenService
         };
 
         foreach (var role in roles)
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            jwtClaims.Add(new Claim(ClaimTypes.Role, role));
 
-        if (extraClaims is not null)
+        if (claims is not null)
         {
-            foreach (var (key, value) in extraClaims)
+            foreach (var (key, value) in claims)
             {
-                if (claims.Any(c => c.Type == key))
+                if (jwtClaims.Any(c => c.Type == key))
                     continue;
 
-                claims.Add(new Claim(key, value));
+                jwtClaims.Add(new Claim(key, value));
             }
         }
 
@@ -64,7 +64,7 @@ public sealed class JwtTokenService : IJwtTokenService
         var jwt = new JwtSecurityToken(
             issuer: _options.Issuer,
             audience: _options.Audience,
-            claims: claims,
+            claims: jwtClaims,
             notBefore: now,
             expires: expiresAt,
             signingCredentials: credentials
@@ -72,10 +72,10 @@ public sealed class JwtTokenService : IJwtTokenService
 
         var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-        return Task.FromResult(new AuthResult(
+        return Task.FromResult(new TokenResult(
             AccessToken: token,
             ExpiresAtUtc: expiresAt,
-            DjId: userId,
+            UserId: userId,
             Username: username.Value
         ));
     }

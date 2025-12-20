@@ -1,31 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YouDj.Domain.Features.Common.ValueObjects;
-using YouDj.Domain.Features.Users.Entities;
 using YouDj.Domain.Features.Uasers.ValueObjects;
+using YouDj.Domain.Features.Users.Entities;
 
-namespace YouDj.Infrastructure.Persistence.Configurations.Users;
+namespace YouDj.Infrastructure.Persistence.Configurations;
 
 public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("users");
+
         builder.HasKey(u => u.Id);
-
-        var usernameConverter = new ValueConverter<Username, string>(
-            v => v.Value,
-            v => Username.Parse(v));
-
-        var emailConverter = new ValueConverter<Email, string>(
-            v => v.Value,
-            v => Email.Parse(v));
-
-        var birthDateConverter = new ValueConverter<DateOfBirth, DateOnly>(
-            v => v.Value,
-            v => DateOfBirth.Parse(v)
-        );
 
         builder.Property(u => u.Id)
             .ValueGeneratedNever();
@@ -36,14 +23,16 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Property(u => u.CreatedAtUtc)
-            .HasColumnName("created_at")
+            .HasColumnName("created_at_utc")
             .IsRequired();
 
         builder.Property(u => u.UpdatedAtUtc)
-            .HasColumnName("updated_at");
+            .HasColumnName("updated_at_utc");
 
         builder.Property(u => u.Username)
-            .HasConversion(usernameConverter)
+            .HasConversion(
+                v => v.Value,
+                v => Username.Parse(v))
             .HasColumnName("username")
             .HasColumnType("citext")
             .HasMaxLength(50)
@@ -54,7 +43,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDatabaseName("ux_users_username");
 
         builder.Property(u => u.Email)
-            .HasConversion(emailConverter)
+            .HasConversion(
+                v => v.Value,
+                v => Email.Parse(v))
             .HasColumnName("email")
             .HasColumnType("citext")
             .HasMaxLength(256)
@@ -65,7 +56,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDatabaseName("ux_users_email");
 
         builder.Property(u => u.BirthDate)
-            .HasConversion(birthDateConverter)
+            .HasConversion(
+                v => v.Value,
+                v => DateOfBirth.Parse(v))
             .HasColumnName("birth_date")
             .HasColumnType("date")
             .IsRequired();
@@ -75,16 +68,16 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Property(u => u.PasswordResetToken)
-            .HasColumnName("pwd_reset_token")
+            .HasColumnName("password_reset_token")
             .HasMaxLength(200);
 
         builder.Property(u => u.PasswordResetTokenExpiresAt)
-            .HasColumnName("pwd_reset_expires_at");
+            .HasColumnName("password_reset_token_expires_at");
 
         builder.Property(u => u.TokenVersion)
             .HasColumnName("token_version")
             .HasDefaultValue(0)
-            .IsRequired()
-            .IsConcurrencyToken();
+            .IsConcurrencyToken()
+            .IsRequired();
     }
 }
