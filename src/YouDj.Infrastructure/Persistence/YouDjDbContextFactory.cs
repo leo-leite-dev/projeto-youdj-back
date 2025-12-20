@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace YouDj.Infrastructure.Data;
+namespace YouDj.Infrastructure.Persistence;
 
-public sealed class AppDbContextFactory
-    : IDesignTimeDbContextFactory<AppDbContext>
+public sealed class YouDjDbContextFactory
+    : IDesignTimeDbContextFactory<YouDjDbContext>
 {
-    public AppDbContext CreateDbContext(string[] args)
+    public YouDjDbContext CreateDbContext(string[] args)
     {
         var environment =
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
@@ -19,11 +19,11 @@ public sealed class AppDbContextFactory
             .AddJsonFile($"appsettings.{environment}.json", optional: true)
             .Build();
 
-        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<YouDjDbContext>();
 
         optionsBuilder.UseNpgsql(
             configuration.GetConnectionString("DefaultConnection"));
 
-        return new AppDbContext(optionsBuilder.Options);
+        return new YouDjDbContext(optionsBuilder.Options);
     }
 }

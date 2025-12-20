@@ -26,5 +26,8 @@ public static class ResultCodes
     public static class Conflict
     {
         public const string Generic = "conflict.generic";
+
+        public const string Email = "conflict.email";
+        public const string Username = "conflict.username";
     }
 }

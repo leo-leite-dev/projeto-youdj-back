@@ -1,13 +1,14 @@
 using YouDj.Application.Abstractions.Repositories;
 using YouDj.Domain.Queue;
+using YouDj.Infrastructure.Persistence;
 
 namespace YouDj.Infrastructure.Data.Repositories;
 
 public sealed class QueueRepository : IQueueRepository
 {
-    private readonly AppDbContext _context;
+    private readonly YouDjDbContext _context;
 
-    public QueueRepository(AppDbContext context)
+    public QueueRepository(YouDjDbContext context)
     {
         _context = context;
     }

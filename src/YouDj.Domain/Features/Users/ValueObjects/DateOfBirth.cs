@@ -1,0 +1,52 @@
+using YouDj.Domain.Features.Common.Exceptions;
+
+public readonly record struct DateOfBirth
+{
+    public DateOnly Value { get; }
+
+    private DateOfBirth(DateOnly value) => Value = value;
+
+    public static DateOfBirth Parse(DateOnly input)
+    {
+        if (!TryParse(input, out var dob))
+            throw new UserException("Data de nascimento inválida.");
+
+        return dob;
+    }
+
+    public static bool TryParse(DateOnly? input, out DateOfBirth dob)
+    {
+        dob = default;
+
+        if (input is null)
+            return false;
+
+        var birth = input.Value;
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        if (birth > today)
+            return false;
+
+        if (birth < today.AddYears(-120))
+            return false;
+
+        dob = new DateOfBirth(birth);
+        return true;
+    }
+
+    public int GetAge()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var age = today.Year - Value.Year;
+        if (Value > today.AddYears(-age))
+            age--;
+
+        return age;
+    }
+
+    public bool IsAdult(int minimumAge = 18)
+        => GetAge() >= minimumAge;
+
+    public override string ToString()
+        => Value.ToString("yyyy-MM-dd");
+}
