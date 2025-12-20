@@ -36,6 +36,9 @@ public class Result
             : new Dictionary<string, object?>(meta);
     }
 
+    public static Result Ok(string? title = null)
+        => new(true, ResultCodes.Generic.Ok, title, null);
+
     public static Result BadRequest(
         string message,
         string? code = null,

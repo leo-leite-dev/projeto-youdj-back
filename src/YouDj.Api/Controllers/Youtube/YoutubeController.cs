@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using YouDj.Api.Helpers;
 using YouDj.Application.Features.Youtube.Search;
 
-namespace YouDj.Api.Controllers;
+namespace YouDj.Api.Controllers.Youtube;
 
 [ApiController]
 [Route("api/youtube")]

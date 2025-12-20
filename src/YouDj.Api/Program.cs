@@ -1,19 +1,16 @@
 using System.Reflection;
-using MediatR;
 using Microsoft.OpenApi.Models;
-using YouDj.Application.Interfaces.Youtube;
-using YouDj.Infrastructure.Youtube;
+using YouDj.Application.DependencyInjection;
+using YouDj.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(Assembly.Load("YouDj.Application")));
-
-builder.Services.AddHttpClient<IYoutubeApiClient, YoutubeApiClient>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
-
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -24,7 +21,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
