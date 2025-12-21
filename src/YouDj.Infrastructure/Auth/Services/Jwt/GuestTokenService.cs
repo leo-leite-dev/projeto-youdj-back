@@ -8,7 +8,7 @@ using YouDj.Application.Features.Auth.Guest;
 
 namespace YouDj.Infrastructure.Auth.Guest;
 
-public sealed class GuestTokenService
+public sealed class GuestTokenService : IGuestTokenService
 {
     private readonly JwtOptions _options;
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using YouDj.Api.Helpers;
 using YouDj.Api.Mappers;
 using YouDj.Api.Requests;
-using YouDj.Application.Features.Auth.Login;
+using YouDj.Application.Features.Auth.Login.Dj;
 
 namespace YouDj.Api.Controllers.Auth;
 
@@ -27,15 +27,15 @@ public sealed class AuthController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpPost("login/guest")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Create(
-     [FromBody] CreateGuestRequest request,
-     CancellationToken ct)
-    {
-        var command = request.ToCommand();
-        var guest = await _mediator.Send(command, ct);
+    // [HttpPost("login/guest")]
+    // [AllowAnonymous]
+    // public async Task<IActionResult> Create(
+    //  [FromBody] CreateGuestRequest request,
+    //  CancellationToken ct)
+    // {
+    //     var command = request.ToCommand();
+    //     var guest = await _mediator.Send(command, ct);
 
-        return Ok(guest);
-    }
+    //     return Ok(guest);
+    // }
 }

@@ -25,7 +25,17 @@ public sealed class GuestConfiguration : IEntityTypeConfiguration<Guest>
         builder.Property(g => g.PhoneVerified)
             .IsRequired();
 
-        builder.Property(g => g.CreatedAt)
+        builder.Property(g => g.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(g => g.CreatedAtUtc)
+            .IsRequired();
+
+        builder.Property(g => g.UpdatedAtUtc);
+
+        builder.Property(g => g.IsActive)
             .IsRequired();
 
         builder.HasIndex(g => g.Phone)

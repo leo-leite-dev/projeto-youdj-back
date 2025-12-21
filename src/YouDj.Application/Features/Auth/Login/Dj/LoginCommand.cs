@@ -1,7 +1,7 @@
 using MediatR;
 using YouDj.Application.Common.Results;
 
-namespace YouDj.Application.Features.Auth.Login;
+namespace YouDj.Application.Features.Auth.Login.Dj;
 
 public sealed record LoginCommand : IRequest<Result<LoginResult>>
 {

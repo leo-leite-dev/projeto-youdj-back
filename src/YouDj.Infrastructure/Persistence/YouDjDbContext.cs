@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YouDj.Domain.Features.Guests;
+using YouDj.Domain.Features.Payments;
 using YouDj.Domain.Features.Playlists;
 using YouDj.Domain.Features.Users.Entities;
 using YouDj.Domain.Queue;
@@ -15,6 +16,7 @@ public sealed class YouDjDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Playlist> Playlists => Set<Playlist>();
     public DbSet<Guest> Guests => Set<Guest>();
+    public DbSet<PixPayment> PixPayments => Set<PixPayment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

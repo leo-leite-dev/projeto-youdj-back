@@ -8,6 +8,7 @@ using YouDj.Application.Abstractions.Repositories;
 using YouDj.Application.Common.Errors;
 using YouDj.Application.Features.Repositories;
 using YouDj.Application.Interfaces.Youtube;
+using YouDj.Infrastructure.Auth.Guest;
 using YouDj.Infrastructure.Auth.Identity;
 using YouDj.Infrastructure.Auth.Services.Jwt;
 using YouDj.Infrastructure.Auth.Services.Security;
@@ -33,9 +34,14 @@ public static class InfrastructureDependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPlaylistRepository, PlaylistRepository>();
         services.AddScoped<IGuestRepository, GuestRepository>();
+        services.AddScoped<IPixPaymentRepository, PixPaymentRepository>();
+
+        services.AddScoped<IGuestSessionReader, GuestSessionReader>();
 
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IGuestTokenService, GuestTokenService>();
+        services.AddScoped<IGuestSessionTokenService, GuestSessionTokenService>();
         services.AddScoped<IUserIdentityService, UserIdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

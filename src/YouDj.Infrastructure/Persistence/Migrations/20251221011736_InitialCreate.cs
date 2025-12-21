@@ -23,7 +23,7 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                     Credits = table.Column<int>(type: "integer", nullable: false),
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     PhoneVerified = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     CreatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false)
@@ -31,6 +31,29 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_guests", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "pix_payments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    GuestId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DjId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Credits = table.Column<int>(type: "integer", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    PlatformFee = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    DjAmount = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_pix_payments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,6 +124,26 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                 column: "Phone");
 
             migrationBuilder.CreateIndex(
+                name: "IX_pix_payments_CreatedAt",
+                table: "pix_payments",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pix_payments_DjId",
+                table: "pix_payments",
+                column: "DjId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pix_payments_GuestId",
+                table: "pix_payments",
+                column: "GuestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pix_payments_Status",
+                table: "pix_payments",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_playlists_dj_id",
                 table: "playlists",
                 column: "dj_id");
@@ -134,6 +177,9 @@ namespace YouDj.Infrastructure.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "guests");
+
+            migrationBuilder.DropTable(
+                name: "pix_payments");
 
             migrationBuilder.DropTable(
                 name: "playlists");

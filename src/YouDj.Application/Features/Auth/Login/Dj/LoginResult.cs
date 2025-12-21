@@ -1,4 +1,4 @@
-namespace YouDj.Application.Features.Auth.Login;
+namespace YouDj.Application.Features.Auth.Login.Dj;
 
 public sealed record LoginResult
 {

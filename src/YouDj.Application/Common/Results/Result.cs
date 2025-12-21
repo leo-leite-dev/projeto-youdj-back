@@ -67,18 +67,12 @@ public class Result
         IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.NotFound.Generic, title, message, meta);
 
-    public static Result Conflict(
-        string message,
-        string? code = null,
-        string? title = null,
-        IDictionary<string, object?>? meta = null)
+    public static Result Conflict(string message, string? code = null,
+         string? title = null, IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.Conflict.Generic, title, message, meta);
 
-    public static Result ServerError(
-        string message,
-        string? code = null,
-        string? title = null,
-        IDictionary<string, object?>? meta = null)
+    public static Result ServerError(string message, string? code = null,
+        string? title = null, IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.Generic.ServerError, title, message, meta);
 
     public Result WithMeta(string key, object? value)
@@ -96,13 +90,8 @@ public sealed class Result<T> : Result
 {
     public T? Value { get; }
 
-    private Result(
-        bool isSuccess,
-        string code,
-        string? title,
-        string? error,
-        T? value,
-        IDictionary<string, object?>? meta = null)
+    private Result(bool isSuccess, string code, string? title, string? error,
+        T? value, IDictionary<string, object?>? meta = null)
         : base(isSuccess, code, title, error, meta)
     {
         Value = value;
@@ -145,27 +134,18 @@ public sealed class Result<T> : Result
         IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.NotFound.Generic, title, message, default, meta);
 
-    public new static Result<T> Conflict(
-        string message,
-        string? code = null,
-        string? title = null,
-        IDictionary<string, object?>? meta = null)
+    public new static Result<T> Conflict(string message, string? code = null,
+        string? title = null, IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.Conflict.Generic, title, message, default, meta);
 
-    public new static Result<T> ServerError(
-        string message,
-        string? code = null,
-        string? title = null,
-        IDictionary<string, object?>? meta = null)
+    public new static Result<T> ServerError(string message, string? code = null,
+        string? title = null, IDictionary<string, object?>? meta = null)
         => new(false, code ?? ResultCodes.Generic.ServerError, title, message, default, meta);
 
     public static Result<T> FromError(Result src)
         => Fail(src.Code, src.Error ?? "Erro", src.Title, new Dictionary<string, object?>(src.Metadata));
 
-    public static Result<T> Fail(
-        string code,
-        string message,
-        string? title = null,
+    public static Result<T> Fail(string code, string message, string? title = null,
         IDictionary<string, object?>? meta = null)
         => new(false, code, title, message, default, meta);
 

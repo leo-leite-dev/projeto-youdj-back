@@ -5,7 +5,7 @@ using YouDj.Application.Abstractions.Repositories;
 using YouDj.Application.Common.Results;
 using YouDj.Domain.Features.Uasers.ValueObjects;
 
-namespace YouDj.Application.Features.Auth.Login;
+namespace YouDj.Application.Features.Auth.Login.Dj;
 
 public sealed class LoginHandler
     : IRequestHandler<LoginCommand, Result<LoginResult>>
@@ -28,8 +28,7 @@ public sealed class LoginHandler
     }
 
     public async Task<Result<LoginResult>> Handle(
-        LoginCommand command,
-        CancellationToken ct)
+        LoginCommand command, CancellationToken ct)
     {
         if (!Email.TryParse(command.Email, out var email))
             return Result<LoginResult>.Unauthorized("Credenciais inválidas.");
