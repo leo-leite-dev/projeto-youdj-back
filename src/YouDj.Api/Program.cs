@@ -1,4 +1,5 @@
 using System.Text;
+using BaitaHora.Api.Web.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,7 +16,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<ICurrentDj, CurrentDj>();
+builder.Services.AddScoped<IJwtCookieWriter, JwtCookieWriter>();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -50,15 +52,28 @@ builder.Services
                 Encoding.UTF8.GetBytes(jwtSecret)
             )
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.TryGetValue("jwtToken", out var token))
+                    context.Token = token;
+                
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(DjOnlyPolicy.Name, policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("is_dj", "true");
-    });
+    options.AddPolicy(
+        DjOnlyPolicy.Name,
+        DjOnlyPolicy.Build());
+
+    options.AddPolicy(
+        GuestOnlyPolicy.Name,
+        GuestOnlyPolicy.Build());
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -98,11 +113,13 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowAnyOrigin();
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -115,7 +132,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseMiddleware<ExceptionMiddleware>();
 

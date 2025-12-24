@@ -8,6 +8,7 @@ public static class DjOnlyPolicy
 
     public static AuthorizationPolicy Build()
         => new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
             .RequireClaim("is_dj", "true")
             .Build();
 }

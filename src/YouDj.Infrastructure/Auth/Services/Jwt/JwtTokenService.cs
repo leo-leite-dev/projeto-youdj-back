@@ -23,9 +23,7 @@ public sealed class JwtTokenService : IJwtTokenService
         _logger = logger;
     }
 
-    public Task<TokenResult> IssueAsync(
-        Guid userId,
-        Username username,
+    public Task<TokenResult> IssueAsync( Guid userId, Username username, 
         IReadOnlyCollection<string> roles,
         IReadOnlyDictionary<string, string>? claims,
         CancellationToken ct)

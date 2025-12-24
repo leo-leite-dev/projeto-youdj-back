@@ -8,26 +8,26 @@ namespace YouDj.Application.Features.Playlists.GenerateQrCode;
 public sealed class GeneratePlaylistQrCodeHandler
     : IRequestHandler<GeneratePlaylistQrCodeCommand, Result<GeneratePlaylistQrCodeResult>>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IDjRepository _djRepository;
     private readonly IPlaylistRepository _playlistRepository;
-    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentDj _currentDj;
 
     public GeneratePlaylistQrCodeHandler(
-        IUserRepository userRepository,
+        IDjRepository djRepository,
         IPlaylistRepository playlistRepository,
-        ICurrentUser currentUser)
+        ICurrentDj currentDj)
     {
-        _userRepository = userRepository;
+        _djRepository = djRepository;
         _playlistRepository = playlistRepository;
-        _currentUser = currentUser;
+        _currentDj = currentDj;
     }
 
     public async Task<Result<GeneratePlaylistQrCodeResult>> Handle(
         GeneratePlaylistQrCodeCommand _, CancellationToken ct)
     {
-        var userId = _currentUser.UserId;
+        var userId = _currentDj.DjId;
 
-        var user = await _userRepository.GetByIdAsync(userId, ct);
+        var user = await _djRepository.GetByIdAsync(userId, ct);
         if (user is null || user.ActivePlaylistId is null)
             return Result<GeneratePlaylistQrCodeResult>.NotFound("Playlist ativa não encontrada.");
 

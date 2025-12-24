@@ -24,15 +24,15 @@ public readonly record struct Username
     public static Username Parse(string input)
     {
         if (input is null)
-            throw new UserException("Username obrigatório.");
+            throw new DjException("Username obrigatório.");
 
         var norm = input.Trim().ToLowerInvariant();
 
         if (Reserved.Contains(norm))
-            throw new UserException("Username reservado.");
+            throw new DjException("Username reservado.");
 
         if (!Pattern.IsMatch(norm))
-            throw new UserException(
+            throw new DjException(
                 "Username inválido. Use 3–20 caracteres (letras, números, ponto ou underline); " +
                 "não comece/termine com . ou _; sem repetição de separadores.");
 

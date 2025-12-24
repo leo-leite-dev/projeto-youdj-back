@@ -1,7 +1,7 @@
 using System.Net.Mail;
 using YouDj.Domain.Features.Common.Exceptions;
 
-namespace YouDj.Domain.Features.Uasers.ValueObjects;
+namespace YouDj.Domain.Features.Users.ValueObjects;
 
 public readonly record struct Email
 {
@@ -12,7 +12,7 @@ public readonly record struct Email
     public static Email Parse(string input)
     {
         if (!TryParse(input, out var email))
-            throw new UserException("E-mail inválido.");
+            throw new DjException("E-mail inválido.");
 
         return email;
     }

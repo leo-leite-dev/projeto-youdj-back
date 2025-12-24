@@ -25,6 +25,13 @@ public sealed class PlaylistRepository : IPlaylistRepository
             .FirstOrDefaultAsync(p => p.Id == id, ct);
     }
 
+    public async Task<Playlist?> GetByPublicTokenAsync(
+        string publicToken, CancellationToken ct = default)
+    {
+        return await _dbContext.Playlists
+            .FirstOrDefaultAsync(p => p.PublicToken == publicToken, ct);
+    }
+
     public async Task UpdateAsync(Playlist playlist, CancellationToken ct = default)
     {
         _dbContext.Playlists.Update(playlist);

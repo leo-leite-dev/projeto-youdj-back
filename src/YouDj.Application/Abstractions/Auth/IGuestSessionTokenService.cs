@@ -4,5 +4,5 @@ namespace YouDj.Application.Abstractions.Auth;
 
 public interface IGuestSessionTokenService
 {
-    GuestSessionResult Issue(string displayName, Guid djId);
+    GuestSessionResult Issue(string displayName, Guid djId, Guid? playlistId = null);
 }

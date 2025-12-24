@@ -178,7 +178,7 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                     b.ToTable("playlists", (string)null);
                 });
 
-            modelBuilder.Entity("YouDj.Domain.Features.Users.Entities.User", b =>
+            modelBuilder.Entity("YouDj.Domain.Features.Users.Entities.Dj", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -205,6 +205,9 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDj")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -250,7 +253,84 @@ namespace YouDj.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("YouDj.Domain.Player.NowPlaying", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DjId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DjId")
+                        .IsUnique();
+
+                    b.ToTable("now_playing", (string)null);
+                });
+
             modelBuilder.Entity("YouDj.Domain.Queue.QueueItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<Guid>("DjId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dj_id");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("interval")
+                        .HasColumnName("duration");
+
+                    b.Property<Guid>("GuestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("guest_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer")
+                        .HasColumnName("position");
+
+                    b.Property<int>("PriceInCredits")
+                        .HasColumnType("integer")
+                        .HasColumnName("price_in_credits");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DjId", "Status")
+                        .HasDatabaseName("ix_queue_items_dj_status");
+
+                    b.ToTable("queue_items", (string)null);
+                });
+
+            modelBuilder.Entity("YouDj.Domain.SongOrders.DjSongOrder", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -269,24 +349,25 @@ namespace YouDj.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
                         .HasColumnName("external_id");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
+                    b.Property<Guid>("GuestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("guest_id");
 
-                    b.Property<int>("Position")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PriceInCredits")
                         .HasColumnType("integer")
-                        .HasColumnName("position");
+                        .HasColumnName("price_in_credits");
 
                     b.Property<string>("Source")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("source");
 
                     b.Property<int>("Status")
@@ -301,8 +382,8 @@ namespace YouDj.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
                         .HasColumnName("title");
 
                     b.Property<DateTimeOffset?>("UpdatedAtUtc")
@@ -311,10 +392,102 @@ namespace YouDj.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DjId", "Status")
-                        .HasDatabaseName("ix_queue_items_dj_status");
+                    b.HasIndex("DjId")
+                        .HasDatabaseName("ix_dj_song_orders_dj_id");
 
-                    b.ToTable("queue_items", (string)null);
+                    b.HasIndex("GuestId")
+                        .HasDatabaseName("ix_dj_song_orders_guest_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_dj_song_orders_status");
+
+                    b.ToTable("dj_song_orders", (string)null);
+                });
+
+            modelBuilder.Entity("YouDj.Domain.Player.NowPlaying", b =>
+                {
+                    b.OwnsOne("YouDj.Domain.Features.Common.ValueObjects.TrackInfo", "Track", b1 =>
+                        {
+                            b1.Property<Guid>("NowPlayingId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("ExternalId")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("ExternalId");
+
+                            b1.Property<string>("Source")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("Source");
+
+                            b1.Property<string>("ThumbnailUrl")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)")
+                                .HasColumnName("ThumbnailUrl");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(300)
+                                .HasColumnType("character varying(300)")
+                                .HasColumnName("Title");
+
+                            b1.HasKey("NowPlayingId");
+
+                            b1.ToTable("now_playing");
+
+                            b1.WithOwner()
+                                .HasForeignKey("NowPlayingId");
+                        });
+
+                    b.Navigation("Track")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("YouDj.Domain.Queue.QueueItem", b =>
+                {
+                    b.OwnsOne("YouDj.Domain.Features.Common.ValueObjects.TrackInfo", "Track", b1 =>
+                        {
+                            b1.Property<Guid>("QueueItemId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("ExternalId")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("external_id");
+
+                            b1.Property<string>("Source")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("source");
+
+                            b1.Property<string>("ThumbnailUrl")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)")
+                                .HasColumnName("thumbnail_url");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("title");
+
+                            b1.HasKey("QueueItemId");
+
+                            b1.ToTable("queue_items");
+
+                            b1.WithOwner()
+                                .HasForeignKey("QueueItemId");
+                        });
+
+                    b.Navigation("Track")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

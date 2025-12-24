@@ -9,7 +9,7 @@ public readonly record struct DateOfBirth
     public static DateOfBirth Parse(DateOnly input)
     {
         if (!TryParse(input, out var dob))
-            throw new UserException("Data de nascimento inválida.");
+            throw new DjException("Data de nascimento inválida.");
 
         return dob;
     }

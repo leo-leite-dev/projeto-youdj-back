@@ -5,11 +5,11 @@ using YouDj.Domain.Features.Common.ValueObjects;
 
 namespace YouDj.Infrastructure.Auth;
 
-public sealed class CurrentUser : ICurrentUser
+public sealed class CurrentDj: ICurrentDj
 {
     private readonly IHttpContextAccessor _http;
 
-    public CurrentUser(IHttpContextAccessor http)
+    public CurrentDj(IHttpContextAccessor http)
     {
         _http = http;
     }
@@ -17,7 +17,7 @@ public sealed class CurrentUser : ICurrentUser
     public bool IsAuthenticated =>
         _http.HttpContext?.User?.Identity?.IsAuthenticated == true;
 
-    public Guid UserId
+    public Guid DjId
     {
         get
         {

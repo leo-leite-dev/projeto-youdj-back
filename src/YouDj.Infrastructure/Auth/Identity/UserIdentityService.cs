@@ -4,11 +4,11 @@ using YouDj.Domain.Features.Users.Entities;
 
 namespace YouDj.Infrastructure.Auth.Identity;
 
-public sealed class UserIdentityService : IUserIdentityService
+public sealed class DjIdentityService : IDjIdentityService
 {
     private const int MinimumDjAge = 18;
 
-    public UserIdentity Create(User user)
+    public DjIdentity Create(Dj user)
     {
         var claims = new Dictionary<string, string>
         {
@@ -17,7 +17,7 @@ public sealed class UserIdentityService : IUserIdentityService
             ["is_dj"] = user.BirthDate.IsAdult(MinimumDjAge) ? "true" : "false"
         };
 
-        return new UserIdentity(
+        return new DjIdentity(
             Roles: Array.Empty<string>(),
             Claims: claims
         );

@@ -6,31 +6,31 @@ using YouDj.Application.Abstractions.Persistences;
 using YouDj.Application.Common.Results;
 using YouDj.Domain.Features.Common.Exceptions;
 using YouDj.Domain.Features.Common.ValueObjects;
-using YouDj.Domain.Features.Uasers.ValueObjects;
 using YouDj.Domain.Features.Users.Entities;
 using YouDj.Domain.Features.Playlists;
+using YouDj.Domain.Features.Users.ValueObjects;
 
 namespace YouDj.Application.Features.Auth.RegisterDj;
 
 public sealed class RegisterDjHandler
     : IRequestHandler<RegisterDjCommand, Result<TokenResult>>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IDjRepository _djRepository;
     private readonly IPlaylistRepository _playlistRepository;
     private readonly IPasswordService _passwordService;
     private readonly IJwtTokenService _tokenService;
-    private readonly IUserIdentityService _identityService;
+    private readonly IDjIdentityService _identityService;
     private readonly IUnitOfWork _unitOfWork;
 
     public RegisterDjHandler(
-        IUserRepository userRepository,
+        IDjRepository djRepository,
         IPlaylistRepository playlistRepository,
         IPasswordService passwordService,
         IJwtTokenService tokenService,
-        IUserIdentityService identityService,
+        IDjIdentityService identityService,
         IUnitOfWork unitOfWork)
     {
-        _userRepository = userRepository;
+        _djRepository = djRepository;
         _playlistRepository = playlistRepository;
         _passwordService = passwordService;
         _tokenService = tokenService;
@@ -49,40 +49,40 @@ public sealed class RegisterDjHandler
 
         var birthDate = DateOfBirth.Parse(command.BirthDate);
 
-        User user;
+        Dj dj;
         try
         {
-            user = User.Create(
+            dj = Dj.Create(
                 email,
                 username,
                 command.Password,
                 birthDate,
                 _passwordService.Hash);
         }
-        catch (UserException ex)
+        catch (DjException ex)
         {
             return Result<TokenResult>.BadRequest(ex.Message);
         }
 
-        await _userRepository.AddAsync(user, ct);
+        await _djRepository.AddAsync(dj, ct);
 
         var playlist = Playlist.Create(
-            djId: user.Id,
-            djUsername: user.Username.Value
+            djId: dj.Id,
+            djUsername: dj.Username.Value
         );
 
         await _playlistRepository.AddAsync(playlist, ct);
 
-        user.SetActivePlaylist(playlist.Id);
-        await _userRepository.UpdateAsync(user, ct);
+        dj.SetActivePlaylist(playlist.Id);
+        await _djRepository.UpdateAsync(dj, ct);
 
         await _unitOfWork.CommitAsync(ct);
 
-        var identity = _identityService.Create(user);
+        var identity = _identityService.Create(dj);
 
         var tokenResult = await _tokenService.IssueAsync(
-            user.Id,
-            user.Username,
+            dj.Id,
+            dj.Username,
             identity.Roles,
             identity.Claims,
             ct

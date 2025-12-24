@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using YouDj.Application.Abstractions.Auth;
 using YouDj.Application.Features.Auth.Guest;
 
-namespace YouDj.Infrastructure.Auth.Guest;
+namespace YouDj.Infrastructure.Auth.Services.Jwt;
 
 public sealed class GuestTokenService : IGuestTokenService
 {

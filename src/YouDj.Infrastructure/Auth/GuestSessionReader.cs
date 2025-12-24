@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using YouDj.Application.Abstractions.Auth;
 
+namespace YouDj.Infrastructure.Auth;
+
 public sealed class GuestSessionReader : IGuestSessionReader
 {
     private readonly JwtOptions _options;
@@ -44,14 +46,18 @@ public sealed class GuestSessionReader : IGuestSessionReader
         );
 
         var scope = principal.FindFirstValue("scope");
-        if (scope != "session")
-            throw new InvalidOperationException("Token inválido para sessão.");
+        if (scope != "guest-session")
+            throw new InvalidOperationException(
+                "Token inválido para sessão de pagamento."
+            );
 
         var displayName = principal.FindFirstValue("display_name");
         var djIdRaw = principal.FindFirstValue("dj_id");
 
         if (displayName is null || djIdRaw is null)
-            throw new InvalidOperationException("Token de sessão inválido.");
+            throw new InvalidOperationException(
+                "Token de sessão de pagamento inválido."
+            );
 
         return new GuestSessionData(
             displayName,

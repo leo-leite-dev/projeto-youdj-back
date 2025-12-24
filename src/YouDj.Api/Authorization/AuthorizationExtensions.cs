@@ -10,6 +10,7 @@ public static class AuthorizationExtensions
         services.AddAuthorization(options =>
         {
             options.AddPolicy(DjOnlyPolicy.Name, DjOnlyPolicy.Build());
+            options.AddPolicy(GuestOnlyPolicy.Name, GuestOnlyPolicy.Build());
         });
 
         return services;
