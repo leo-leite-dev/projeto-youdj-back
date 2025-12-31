@@ -8,11 +8,12 @@ namespace YouDj.Domain.Queue;
 public sealed class QueueItem : EntityBase
 {
     public Guid DjId { get; private set; }
+
     public Guid GuestId { get; private set; }
+
     public int PriceInCredits { get; private set; }
 
     public TrackInfo Track { get; private set; } = default!;
-
     public TimeSpan? Duration { get; private set; }
 
     public QueueStatus Status { get; private set; }
@@ -32,7 +33,8 @@ public sealed class QueueItem : EntityBase
         Position = 0;
     }
 
-    public static QueueItem CreateByDj(Guid djId, TrackInfo track, TimeSpan? duration)
+    public static QueueItem CreateByDj(
+        Guid djId, TrackInfo track, TimeSpan? duration)
     {
         if (djId == Guid.Empty)
             throw new QueueException("DJ inválido.");
@@ -43,10 +45,42 @@ public sealed class QueueItem : EntityBase
         return CreateInternal(djId, Guid.Empty, 0, track, duration);
     }
 
+    public static QueueItem CreateByExtension(
+        Guid djId, Guid extensionGuestId,
+        TrackInfo track, TimeSpan? duration)
+    {
+        if (djId == Guid.Empty)
+            throw new QueueException("DJ inválido.");
+
+        if (extensionGuestId == Guid.Empty)
+            throw new QueueException("Guest inválido.");
+
+        return CreateInternal(djId, extensionGuestId, 0, track, duration);
+    }
+
+    // 💳 Convidado comum (pedido pago / futuro)
     public static QueueItem CreateFromOrder(DjSongOrder order)
     {
         if (order is null)
-            throw new QueueException("Pedido inválido.");
+            throw new QueueException("Order inválida.");
+
+        if (order.DjId == Guid.Empty)
+            throw new QueueException("DJ inválido na order.");
+
+        if (string.IsNullOrWhiteSpace(order.ExternalId))
+            throw new QueueException("Order sem ExternalId.");
+
+        if (string.IsNullOrWhiteSpace(order.Title))
+            throw new QueueException("Order sem Title.");
+
+        if (string.IsNullOrWhiteSpace(order.Source))
+            throw new QueueException("Order sem Source.");
+
+        if (string.IsNullOrWhiteSpace(order.ThumbnailUrl))
+            throw new QueueException("Order sem Thumbnail.");
+
+        if (order.PriceInCredits <= 0)
+            throw new QueueException("Order sem custo.");
 
         var track = TrackInfo.Create(
             order.ExternalId,
@@ -57,21 +91,21 @@ public sealed class QueueItem : EntityBase
 
         return CreateInternal(
             order.DjId,
-            order.GuestId,
+            Guid.Empty,
             order.PriceInCredits,
             track,
             order.Duration
         );
     }
 
-    private static QueueItem CreateInternal(Guid djId, Guid guestId, int priceInCredits,
-        TrackInfo track, TimeSpan? duration)
+    private static QueueItem CreateInternal(Guid djId, Guid guestId,
+        int priceInCredits, TrackInfo track, TimeSpan? duration)
     {
-        if (guestId == Guid.Empty && priceInCredits > 0)
-            throw new QueueException("Créditos inválidos para item sem guest.");
+        if (guestId == Guid.Empty && priceInCredits < 0)
+            throw new QueueException("Créditos inválidos.");
 
-        if (guestId != Guid.Empty && priceInCredits <= 0)
-            throw new QueueException("Preço inválido para pedido.");
+        if (guestId != Guid.Empty && priceInCredits > 0)
+            throw new QueueException("Convidado especial não usa créditos.");
 
         return new QueueItem(djId, guestId, priceInCredits, track, duration);
     }

@@ -1,6 +1,6 @@
 namespace YouDj.Application.Features.Auth.Login.Guest;
 
-public sealed record GuestLoginResult
+public sealed record GuestLoginDto
 {
     public required Guid GuestId { get; init; }
     public required string DisplayName { get; init; }

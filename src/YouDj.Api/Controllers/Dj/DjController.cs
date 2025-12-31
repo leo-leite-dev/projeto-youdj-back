@@ -1,15 +1,14 @@
-using BaitaHora.Api.Web.Cookies;
 using MediatR;
+using BaitaHora.Api.Web.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YouDj.Api.Contracts.Auth;
 using YouDj.Api.Helpers;
 using YouDj.Api.Mappers;
-using YouDj.Api.Mappers.Auth;
+using YouDj.Api.Mappers.Dj.Auth;
 using YouDj.Api.Requests;
 using YouDj.Application.Abstractions.Auth;
 using YouDj.Application.Abstractions.Web;
-using YouDj.Application.Features.Auth.Login.Dj;
 
 namespace YouDj.Api.Controllers.Dj;
 
@@ -31,10 +30,20 @@ public sealed class DjController : ControllerBase
         _cookieWriter = cookieWriter;
     }
 
+    [HttpPost("register-dj")]
+    public async Task<IActionResult> RegisterDj(
+    [FromBody] RegisterDjRequest request,
+    CancellationToken ct)
+    {
+        var command = request.ToCommand();
+        var result = await _mediator.Send(command, ct);
+        return result.ToActionResult(this);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(
-        [FromBody] LoginDjRequest request,
-        CancellationToken ct)
+    [FromBody] LoginDjRequest request,
+    CancellationToken ct)
     {
         var result = await _mediator.Send(request.ToCommand(), ct);
 
@@ -53,17 +62,6 @@ public sealed class DjController : ControllerBase
         return Ok(login.ToResponse());
     }
 
-
-    [HttpPost("register-dj")]
-    public async Task<IActionResult> RegisterDj(
-    [FromBody] RegisterDjRequest request,
-    CancellationToken ct)
-    {
-        var command = request.ToCommand();
-        var result = await _mediator.Send(command, ct);
-        return result.ToActionResult(this);
-    }
-
     [HttpGet("me")]
     [Authorize]
     public IActionResult Me(
@@ -75,6 +73,7 @@ public sealed class DjController : ControllerBase
         return Ok(new LoginResponse
         {
             DjId = currentDj.DjId,
+            PlaylistId = currentDj.PlaylistId,
             ExpiresAtUtc = DateTime.UtcNow,
             IsDj = true
         });

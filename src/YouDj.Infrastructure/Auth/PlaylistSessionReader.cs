@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using YouDj.Application.Abstractions.Auth;
-using YouDj.Application.Features.Auth.Session;
+using YouDj.Application.Features.Dj.Auth.Session;
 
 namespace YouDj.Infrastructure.Auth;
 

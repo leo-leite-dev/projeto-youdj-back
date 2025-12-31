@@ -11,7 +11,7 @@ artifacts/
 # Rider / JetBrains
 .idea/
 
-# User-specific files
+# UserDj-specific files
 *.user
 *.suo
 *.userosscache

@@ -5,7 +5,7 @@ using YouDj.Domain.Features.Common.ValueObjects;
 
 namespace YouDj.Infrastructure.Auth;
 
-public sealed class CurrentDj: ICurrentDj
+public sealed class CurrentDj : ICurrentDj
 {
     private readonly IHttpContextAccessor _http;
 
@@ -24,6 +24,19 @@ public sealed class CurrentDj: ICurrentDj
             var raw =
                 _http.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? _http.HttpContext?.User?.FindFirstValue("sub");
+
+            return Guid.TryParse(raw, out var id)
+                ? id
+                : Guid.Empty;
+        }
+    }
+
+    public Guid PlaylistId
+    {
+        get
+        {
+            var raw =
+                _http.HttpContext?.User?.FindFirstValue("playlist_id");
 
             return Guid.TryParse(raw, out var id)
                 ? id

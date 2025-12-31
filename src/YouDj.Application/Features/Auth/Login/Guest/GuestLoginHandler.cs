@@ -7,7 +7,7 @@ using YouDj.Application.Features.Repositories;
 namespace YouDj.Application.Features.Auth.Login.Guest;
 
 public sealed class GuestLoginHandler
-    : IRequestHandler<GuestLoginCommand, Result<GuestLoginResult>>
+    : IRequestHandler<GuestLoginCommand, Result<GuestLoginDto>>
 {
     private readonly IGuestRepository _guestRepository;
     private readonly IGuestTokenService _tokenService;
@@ -23,7 +23,7 @@ public sealed class GuestLoginHandler
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<GuestLoginResult>> Handle(
+    public async Task<Result<GuestLoginDto>> Handle(
         GuestLoginCommand command,
         CancellationToken ct)
     {
@@ -34,7 +34,7 @@ public sealed class GuestLoginHandler
 
         var token = _tokenService.Issue(guest.Id);
 
-        return Result<GuestLoginResult>.Ok(new GuestLoginResult
+        return Result<GuestLoginDto>.Ok(new GuestLoginDto
         {
             GuestId = guest.Id,
             DisplayName = guest.DisplayName,

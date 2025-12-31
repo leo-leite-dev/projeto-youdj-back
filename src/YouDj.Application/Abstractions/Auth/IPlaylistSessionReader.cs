@@ -1,4 +1,4 @@
-using YouDj.Application.Features.Auth.Session;
+using YouDj.Application.Features.Dj.Auth.Session;
 
 public interface IPlaylistSessionReader
 {

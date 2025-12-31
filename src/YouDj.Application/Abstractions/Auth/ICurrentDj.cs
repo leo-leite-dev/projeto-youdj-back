@@ -7,6 +7,7 @@ public interface ICurrentDj
 {
     bool IsAuthenticated { get; }
     Guid DjId { get; }
+    Guid PlaylistId { get; }
     Username Username { get; }
     string? Email { get; }
 }

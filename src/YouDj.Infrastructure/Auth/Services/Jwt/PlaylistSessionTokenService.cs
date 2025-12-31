@@ -4,8 +4,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using YouDj.Application.Abstractions.Auth;
-using YouDj.Application.Abstractions.Repositories;
-using YouDj.Application.Features.Auth.PlaylistSession;
+using YouDj.Application.Abstractions.Repositories.Dj.Playlists;
+using YouDj.Application.Features.Dj.Auth.Session;
 using YouDj.Domain.Features.Common.Exceptions;
 
 namespace YouDj.Infrastructure.Auth.Services.Jwt;

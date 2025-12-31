@@ -1,9 +1,9 @@
-using YouDj.Application.Features.Auth.Identity;
-using YouDj.Domain.Features.Users.Entities;
+using YouDj.Application.Features.Dj.Auth.Identity;
+using YouDj.Domain.Features.Dj.Entities.User;
 
 namespace YouDj.Application.Abstractions.Identity;
 
 public interface IDjIdentityService
 {
-    DjIdentity Create(Dj dj);
+    DjIdentity Create(UserDj dj);
 }
