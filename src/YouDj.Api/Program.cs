@@ -10,20 +10,22 @@ using YouDj.Application.DependencyInjection;
 using YouDj.Infrastructure.Auth;
 using YouDj.Infrastructure.DependencyInjection;
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    Args = args,
-    EnvironmentName = Environments.Production
-});
-
-builder.Configuration.Sources.Clear();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile(
+        $"appsettings.{builder.Environment.EnvironmentName}.json",
+        optional: true,
+        reloadOnChange: true
+    )
     .AddEnvironmentVariables();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+if (!builder.Environment.IsDevelopment())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -35,9 +37,11 @@ builder.Services.AddScoped<IJwtCookieWriter, JwtCookieWriter>();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-var jwtSecret = builder.Configuration["Jwt:Secret"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
+var jwtSection = builder.Configuration.GetSection("Jwt");
+
+var jwtSecret = jwtSection["Secret"];
+var jwtIssuer = jwtSection["Issuer"];
+var jwtAudience = jwtSection["Audience"];
 
 if (string.IsNullOrWhiteSpace(jwtSecret))
 {
@@ -71,9 +75,7 @@ builder.Services
             OnMessageReceived = context =>
             {
                 if (context.Request.Cookies.TryGetValue("jwtToken", out var token))
-                {
                     context.Token = token;
-                }
 
                 return Task.CompletedTask;
             }
@@ -143,8 +145,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
 app.UseMiddleware<ExceptionMiddleware>();

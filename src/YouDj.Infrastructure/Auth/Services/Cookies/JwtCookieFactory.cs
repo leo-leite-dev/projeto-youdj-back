@@ -15,7 +15,7 @@ public sealed class JwtCookieFactory : IJwtCookieFactory
             HttpOnly: true,
             Secure: true,
             Path: "/",
-            SameSite: "Lax"
+            SameSite: "None" // corrigir depois para funcionar dev e prod
         );
 
     public JwtCookie CreateLogoutCookie()
@@ -26,6 +26,6 @@ public sealed class JwtCookieFactory : IJwtCookieFactory
             HttpOnly: true,
             Secure: true,
             Path: "/",
-            SameSite: "Lax"
+            SameSite: "None"
         );
 }
