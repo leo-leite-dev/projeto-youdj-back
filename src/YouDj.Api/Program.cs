@@ -10,7 +10,17 @@ using YouDj.Application.DependencyInjection;
 using YouDj.Infrastructure.Auth;
 using YouDj.Infrastructure.DependencyInjection;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    EnvironmentName = Environments.Production
+});
+
+builder.Configuration.Sources.Clear();
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddEnvironmentVariables();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
@@ -61,7 +71,9 @@ builder.Services
             OnMessageReceived = context =>
             {
                 if (context.Request.Cookies.TryGetValue("jwtToken", out var token))
+                {
                     context.Token = token;
+                }
 
                 return Task.CompletedTask;
             }
@@ -70,13 +82,8 @@ builder.Services
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(
-        DjOnlyPolicy.Name,
-        DjOnlyPolicy.Build());
-
-    options.AddPolicy(
-        GuestOnlyPolicy.Name,
-        GuestOnlyPolicy.Build());
+    options.AddPolicy(DjOnlyPolicy.Name, DjOnlyPolicy.Build());
+    options.AddPolicy(GuestOnlyPolicy.Name, GuestOnlyPolicy.Build());
 });
 
 builder.Services.AddSwaggerGen(c =>
